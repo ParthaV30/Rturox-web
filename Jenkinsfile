@@ -21,11 +21,11 @@ pipeline {
             }
         }
 
-        stage('Remove Old Container') {
+        stage('Stop & Remove Old Containers') {
             steps {
                 sh '''
-                docker stop $CONTAINER_NAME || true
-                docker rm $CONTAINER_NAME || true
+                docker stop $(docker ps -aq) || true
+                docker rm $(docker ps -aq) || true
                 '''
             }
         }
@@ -34,6 +34,14 @@ pipeline {
             steps {
                 sh '''
                 docker rmi $IMAGE_NAME || true
+                '''
+            }
+        }
+
+        stage('Clean Docker Builder Cache') {
+            steps {
+                sh '''
+                docker builder prune -af || true
                 '''
             }
         }
@@ -75,6 +83,8 @@ pipeline {
 
         failure {
             echo '❌ Deployment Failed!'
+            sh 'docker ps -a || true'
+            sh 'docker logs $CONTAINER_NAME || true'
         }
 
         always {
