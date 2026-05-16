@@ -1,5 +1,5 @@
 # Production build for Next.js app
-FROM node:18-alpine
+FROM node:20-alpine AS bui
 
 # Set working directory
 WORKDIR /app
@@ -16,8 +16,8 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Expose port 3000 (Next.js default)
+# Expose port 3000
 EXPOSE 3000
 
-# Start the application
+# Start app
 CMD ["npm", "start"]
